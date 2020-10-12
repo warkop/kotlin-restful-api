@@ -1,16 +1,19 @@
 package warkop.kotlinrestfulapi.service.impl
 
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import warkop.kotlinrestfulapi.entity.Product
 import warkop.kotlinrestfulapi.error.NotFoundException
 import warkop.kotlinrestfulapi.model.CreateProductRequest
+import warkop.kotlinrestfulapi.model.ListProductRequest
 import warkop.kotlinrestfulapi.model.ProductResponse
 import warkop.kotlinrestfulapi.model.UpdateProductRequest
 import warkop.kotlinrestfulapi.repository.ProductRepository
 import warkop.kotlinrestfulapi.service.ProductService
 import warkop.kotlinrestfulapi.validation.ValidationUtil
 import java.util.*
+import java.util.stream.Collectors
 
 @Service
 class ProductServiceImpl(
@@ -78,6 +81,12 @@ class ProductServiceImpl(
     override fun delete(id: String) {
         val product = findByIdOrThrowNotFound(id)
         productRepository.delete(product)
+    }
+
+    override fun list(listProductRequest: ListProductRequest): List<ProductResponse> {
+        val page = productRepository.findAll(PageRequest.of(listProductRequest.page, listProductRequest.size))
+        val products: List<Product> = page.get().collect(Collectors.toList())
+        return products.map { convertProductToProductResponse(it) }
     }
 
 

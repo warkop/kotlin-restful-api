@@ -1,10 +1,7 @@
 package warkop.kotlinrestfulapi.controller
 
 import org.springframework.web.bind.annotation.*
-import warkop.kotlinrestfulapi.model.CreateProductRequest
-import warkop.kotlinrestfulapi.model.ProductResponse
-import warkop.kotlinrestfulapi.model.UpdateProductRequest
-import warkop.kotlinrestfulapi.model.WebResponse
+import warkop.kotlinrestfulapi.model.*
 import warkop.kotlinrestfulapi.service.ProductService
 
 @RestController
@@ -61,6 +58,21 @@ class ProductController(val productService: ProductService) {
                 code = 200,
                 status = "OK",
                 data = id
+        )
+    }
+
+    @GetMapping(
+            value = ["/api/products"],
+            produces = ["application/json"]
+    )
+    fun listProducts(@RequestParam(value="size", defaultValue = "10") size: Int,
+                     @RequestParam(value="page", defaultValue = "0") page: Int):WebResponse<List<ProductResponse>>{
+        val request = ListProductRequest(page, size)
+        val response = productService.list(request)
+        return WebResponse(
+                code = 200,
+                status = "OK",
+                data = response
         )
     }
 }
